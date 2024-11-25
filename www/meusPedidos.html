@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 1rem;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        td {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Consultar Pedidos</h1>
+        <div class="form-group">
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" placeholder="Digite o CPF">
+            <button id="searchBtn">Buscar Pedidos</button>
+        </div>
+
+        <table id="pedidoTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>CPF</th>
+                    <th>Produtos</th>
+                    <th>Data do Pedido</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Os pedidos serão populados dinamicamente aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('searchBtn').addEventListener('click', function () {
+            const cpf = document.getElementById('cpf').value.trim();
+
+            if (!cpf) {
+                alert("Por favor, digite um CPF.");
+                return;
+            }
+
+            if (!/^\d{11}$/.test(cpf)) {
+                alert("CPF deve conter 11 dígitos numéricos.");
+                return;
+            }
+
+            fetchPedidos(cpf);
+        });
+
+        function fetchPedidos(cpf) {
+            console.log(cpf);
+            const url = `https://10.241.162.251:7154/API/GetPedidosByCpf/${cpf}`;
+
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error("Erro ao buscar os pedidos.");
+                    }
+                })
+                .then(pedidos => {
+                    renderPedidos(pedidos);
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("Erro ao buscar os pedidos. Verifique o console para mais detalhes.");
+                });
+        }
+
+        function renderPedidos(pedidos) {
+            console.log(pedidos);
+            const tbody = document.getElementById('pedidoTable').querySelector('tbody');
+            tbody.innerHTML = ""; // Limpa a tabela antes de preencher
+
+            if (!pedidos.length) {
+                const row = tbody.insertRow();
+                const cell = row.insertCell(0);
+                cell.colSpan = 4;
+                cell.textContent = "Nenhum pedido encontrado para este CPF.";
+                cell.style.textAlign = "center";
+                return;
+            }
+            console.log(pedidos)
+            pedidos.forEach(pedido => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = pedido.id;
+                row.insertCell(1).textContent = pedido.cpf;
+                row.insertCell(2).textContent = pedido.produtos;
+                row.insertCell(3).textContent = new Date(pedido.dataPedido).toLocaleDateString('pt-BR');
+            });
+        }
+    </script>
+</body>
+</html>

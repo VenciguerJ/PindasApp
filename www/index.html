@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+   
+
+    <link rel="stylesheet" href="css/style/index.css">
+    <title>Login</title>
+    <!-- Adicionando a biblioteca Font Awesome atualizada -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="container">
+        <div class="icon-container">
+            <i class="fas fa-user-circle fa-3x"></i>
+        </div>
+        <h2 id="Login">Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="cpf"><i class="fa fa-user"></i> CPF</label>
+                <input type="number" id="cpf" name="cpf" placeholder="CPF" required>
+            </div>
+            <div class="form-group">
+                <label for="senha"> <i class="fa fa-lock"></i> Senha</label>
+                <input type="password" id="senha" name="senha" placeholder="Senha" required>
+            </div>
+            <button type="submit"><a href="/www/home.html">Login</a></button>
+        </form>
+        <p class="register-link">
+            Não possui conta? <a href="criar-usuario.html">Clique aqui</a>
+        </p>
+    </div>
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        // Captura os valores do formulário de login
+        let cpf = document.getElementById("cpf").value.trim().replace(/\D/g, ''); // Remove qualquer caractere não numérico
+
+        let senha = document.getElementById("senha").value.trim();
+
+        // Validação dos campos de login
+        if (!cpf || !senha) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        if (!/^\d{11}$/.test(cpf)) {
+            alert("CPF deve conter 11 dígitos numéricos.");
+            return;
+        }
+
+        // Envia os dados para a API de autenticação
+        testarAuthenticate(cpf, senha);
+    });
+
+    // Função para testar o método Authenticate
+    function testarAuthenticate(cpf, senha) {
+        const cliente = {
+            // Ajuste conforme necessário
+            CPF: cpf,
+            Senha: senha
+        };
+
+        const url = "https://10.241.162.251:7154/API/Authenticate";
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(cliente)
+        })
+        .then(response => {
+            console.log("Status da resposta:", response.status);
+            if (response.ok) {
+                return response.json();
+            } else {
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage || "Erro desconhecido");
+                });
+            }
+        })
+        .then(data => {
+            window.location.href = "/home.html";
+        })
+        .catch(error => {
+            console.error("Erro ao autenticar:", error.message);
+            alert(`Erro: ${error.message}`);
+        });
+    }
+
+// Chamar a função ao carregar a página
+// document.addEventListener("DOMContentLoaded", testarAuthenticate);
+
+});
+
+</script>
+
+</html>

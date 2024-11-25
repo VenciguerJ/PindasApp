@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Produtos</title>
+    <!-- Adicionando a biblioteca Font Awesome -->
+    <style>
+        /* Reset básico para garantir que todos os navegadores renderizem de forma consistente */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Corpo da página */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f3f4f6;  /* Cor de fundo suave */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Container central do formulário */
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 480px;
+    animation: fadeIn 0.5s ease-in-out;  /* Animação de entrada suave */
+}
+
+/* Título */
+h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Estilos para os grupos de formulário */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Estilos para os inputs e textarea */
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease-in-out;
+}
+
+/* Foco nos inputs */
+input[type="number"]:focus,
+textarea:focus {
+    border-color: #5c6bc0;  /* Cor do border quando o campo está em foco */
+    outline: none;
+}
+
+/* Estilo para o botão */
+button {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    color: white;
+    background-color: #5c6bc0;  /* Cor de fundo do botão */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+/* Efeito de hover e active no botão */
+button:hover {
+    background-color: #3f51b5;
+}
+
+button:active {
+    background-color: #3949ab;
+}
+
+/* Estilo para a textarea */
+textarea {
+    resize: vertical;
+    height: 120px;  /* Altura inicial da textarea */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Link de registro */
+.register-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-link a {
+    color: #5c6bc0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Animação de fade-in para o container */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Formulário de Pedido</h2>
+        <form id="pedidoForm">
+            <div class="form-group">
+                <label for="cpf">CPF</label>
+                <input type="number" id="cpf" name="cpf" placeholder="Digite seu CPF" required>
+            </div>
+
+            <div class="form-group">
+                <label for="produtos">Produtos Desejados</label>
+                <textarea id="produtos" name="produtos" placeholder="Digite os produtos que você deseja" rows="6" required></textarea>
+            </div>
+
+            <button type="submit">Enviar Pedido</button>
+        </form>
+    </div>
+
+    
+    <script>
+        // Função para enviar os dados para a API quando o formulário for submetido
+        document.getElementById("pedidoForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Previne o envio tradicional do formulário
+
+            let cpf = document.getElementById("cpf").value.trim();
+            let produtos = document.getElementById("produtos").value.trim();
+
+            // Validação básica para garantir que o CPF e os produtos foram preenchidos
+            if (!cpf || !produtos) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            TestaEnvio(cpf, produtos);
+        });
+        function TestaEnvio(cpf, produtos){
+        const pedido = {
+                CPF: cpf,
+                Produtos: produtos
+            };
+
+            // URL da API onde o pedido será enviado
+            const url = "https://10.241.162.251:7154/API/pedido"; // Substitua pela URL correta
+
+            // Envia os dados para a API usando fetch
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(pedido)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Exibe a resposta da API
+                if (data.sucesso) {
+                    window.location.href = "/home.html";
+                } else {
+                    alert("Erro ao enviar o pedido: " + data.mensagem);
+                }
+            })
+            .catch(error => {
+                alert("Erro ao enviar o pedido: " + error.message);
+            });
+        }
+    </script>
+</body>
+</html>
